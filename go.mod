@@ -3,8 +3,6 @@ module github.com/chyroc/dropbox-cli
 go 1.18
 
 require (
-	github.com/chyroc/go-ptr v1.5.1
-	github.com/davecgh/go-spew v1.1.0
 	github.com/dropbox/dropbox-sdk-go-unofficial/v6 v6.0.4
 	github.com/urfave/cli/v2 v2.3.0
 )

@@ -132,7 +132,7 @@ func (r *Cli) Upload(localFile, remotePath string, blockSuccessCallback func(idx
 	for i := uint64(blockSize); i < localContentLength; i += blockSize {
 		idx++
 		var reader io.Reader
-		var isClose = false
+		isClose := false
 		if i+blockSize >= localContentLength {
 			reader = bytes.NewReader(localContent[i:])
 			isClose = true
