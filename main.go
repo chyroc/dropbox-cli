@@ -13,6 +13,7 @@ func main() {
 		Name: "dropbox-cli",
 		Commands: []*cli.Command{
 			command.Download(),
+			command.Upload(),
 		},
 	}
 	err := app.Run(os.Args)

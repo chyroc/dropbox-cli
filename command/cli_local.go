@@ -1,15 +1,30 @@
 package command
 
 import (
+	"crypto/sha256"
 	"fmt"
 	"io"
+	"io/fs"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
 )
 
-func (r *Cli) formatPath(path string) string {
+func (r *Cli) formatRemotePath(path string) string {
 	path = "/" + strings.Trim(strings.TrimSpace(path), "/")
+	return path
+}
+
+// `.` or `GitHub`
+func (r *Cli) formatLocalPath(path string) string {
+	if strings.HasPrefix(path, ".") {
+		path = path[1:]
+	}
+	path = strings.Trim(strings.TrimSpace(path), "/")
+	if path == "" {
+		path = "."
+	}
 	return path
 }
 
@@ -32,6 +47,25 @@ func (r *Cli) SetRootPath(path string) {
 	r.RemoteRootPath = "/" + strings.Trim(strings.TrimSpace(path), "/") // /GitHub/100days
 }
 
+func (r *Cli) ListLocal(dir string, f func(path string, info fs.FileInfo) error) error {
+	fs, err := ioutil.ReadDir(dir)
+	if err != nil {
+		return err
+	}
+	for _, info := range fs {
+		path := fmt.Sprintf("%s/%s", dir, info.Name())
+		if err := f(path, info); err != nil {
+			return err
+		}
+		if info.IsDir() {
+			if err := r.ListLocal(path, f); err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
 func (r *Cli) WriteToLocal(filename string, body io.Reader) error {
 	// defer body.Close()
 
@@ -43,4 +77,20 @@ func (r *Cli) WriteToLocal(filename string, body io.Reader) error {
 
 	_, err = io.Copy(f, body)
 	return err
+}
+
+func (r *Cli) GenContentHash(localContent []byte) (string, error) {
+	blocks := []byte{}
+	size := 1024 * 1024 * 4
+	for i := 0; i < len(localContent); i += size {
+		if i+size > len(localContent) {
+			d := sha256.Sum256(localContent[i:])
+			blocks = append(blocks, d[:]...)
+		} else {
+			d := sha256.Sum256(localContent[i : i+size])
+			blocks = append(blocks, d[:]...)
+		}
+	}
+	result := sha256.Sum256(blocks)
+	return fmt.Sprintf("%x", result[:]), nil
 }

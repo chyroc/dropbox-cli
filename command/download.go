@@ -17,7 +17,7 @@ func Download() *cli.Command {
 		Action: func(c *cli.Context) error {
 			r := New(c.String("token"))
 
-			path := r.formatPath(c.Args().First())
+			path := r.formatRemotePath(c.Args().First())
 			r.SetRootPath(path)
 
 			fmt.Printf("> start download %q to %q.\n", r.RemoteRootPath, r.LocalRootPath)
