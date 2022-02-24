@@ -4,14 +4,13 @@ import (
 	"crypto/sha256"
 	"fmt"
 	"io"
-	"io/fs"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
 )
 
-func (r *Cli) ListLocal(dir string, f func(path string, info fs.FileInfo) error) error {
+func (r *Cli) ListLocal(dir string, f func(path string, info os.FileInfo) error) error {
 	info, err := os.Stat(dir)
 	if err != nil {
 		return err
