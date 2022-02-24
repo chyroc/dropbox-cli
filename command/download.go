@@ -20,6 +20,14 @@ func Download() *cli.Command {
 
 			remoteRootPath := toRemotePath(formatPath(c.Args().Get(0)))                     // left slash, right no slash
 			localRootPath := toLocalPath(formatPathByRev(c.Args().Get(0), c.Args().Get(1))) // left, right both no slash
+			if remoteRootPath == "" {
+				fmt.Printf("> download fail: empty remote path.\n")
+				return fmt.Errorf("empty remote path")
+			}
+			if localRootPath == "" {
+				fmt.Printf("> download %q fail: empty local path.\n", remoteRootPath)
+				return fmt.Errorf("empty local path")
+			}
 
 			fmt.Printf("> start download %q to %q.\n", remoteRootPath, localRootPath)
 

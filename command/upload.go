@@ -19,6 +19,14 @@ func Upload() *cli.Command {
 
 			localRootPath := toLocalPath(formatPath(c.Args().Get(0)))                         // left, right both no slash
 			remoteRootPath := toRemotePath(formatPathByRev(c.Args().Get(0), c.Args().Get(1))) // left slash, right no slash
+			if localRootPath == "" {
+				fmt.Printf("> upload fail: empty local path.\n")
+				return fmt.Errorf("empty local path")
+			}
+			if remoteRootPath == "" {
+				fmt.Printf("> upload %q fail: empty remote path.\n", localRootPath)
+				return fmt.Errorf("empty remote path")
+			}
 
 			fmt.Printf("> start upload %q to %q.\n", localRootPath, remoteRootPath)
 
