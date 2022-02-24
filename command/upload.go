@@ -9,25 +9,25 @@ import (
 
 func Upload() *cli.Command {
 	return &cli.Command{
-		Name: "upload",
+		Name:      "upload",
+		UsageText: "dropbox-cli upload <local-path> <remote-path>[/]",
 		Flags: []cli.Flag{
 			&cli.StringFlag{Name: "token"},
 		},
 		Action: func(c *cli.Context) error {
 			r := New(c.String("token"))
 
-			localPath := r.formatLocalPath(c.Args().First())
-			remotePath := r.formatRemotePath(c.Args().Get(1))
+			localRootPath := toLocalPath(formatPath(c.Args().Get(0)))                         // left, right both no slash
+			remoteRootPath := toRemotePath(formatPathByRev(c.Args().Get(0), c.Args().Get(1))) // left slash, right no slash
 
-			fmt.Printf("> start upload %q to %q.\n", localPath, remotePath)
+			fmt.Printf("> start upload %q to %q.\n", localRootPath, remoteRootPath)
 
-			err := r.ListLocal(localPath, func(path string, info fs.FileInfo) error {
+			err := r.ListLocal(localRootPath, func(localPath string, info fs.FileInfo) error {
 				if info.IsDir() {
 					return nil
 				}
 
-				remotePath := r.formatRevRemotePath(localPath, path, remotePath)
-				localPath := path
+				remotePath := formatRelatePath(remoteRootPath, localRootPath, localPath)
 
 				res, err := r.Upload(localPath, remotePath, func(idx int) {
 					fmt.Printf("> upload %q to %q block[%d] success.\n", localPath, remotePath, idx)

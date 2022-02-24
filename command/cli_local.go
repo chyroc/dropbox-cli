@@ -11,51 +11,6 @@ import (
 	"strings"
 )
 
-func (r *Cli) formatRemotePath(path string) string {
-	path = "/" + strings.Trim(strings.TrimSpace(path), "/")
-	return path
-}
-
-// `.` or `GitHub`
-func (r *Cli) formatLocalPath(path string) string {
-	if strings.HasPrefix(path, "./") {
-		path = path[1:]
-	}
-	path = strings.Trim(strings.TrimSpace(path), "/")
-	if path == "" {
-		path = "."
-	}
-	return path
-}
-
-func (r *Cli) formatRevRemotePath(localPath, path, remotePath string) string {
-	// localPath  = a/b
-	// path       = a/b/c/d.txt
-	// remotePath = Git
-
-	// result     = Git/c/d.txt
-	return fmt.Sprintf("%s/%s", remotePath, path[len(localPath)+1:])
-}
-
-func (r *Cli) generateLocalName(remotePath string) string {
-	// /GitHub/100days/meta.json -> 100days/meta.json
-	if strings.ToLower(remotePath)[0:len(r.RemoteRootPath)] != strings.ToLower(r.RemoteRootPath) {
-		panic(fmt.Sprintf("%q not start with %q", remotePath, r.RemoteRootPath))
-	}
-	remotePath = strings.Trim(remotePath[len(r.RemoteRootPath):], "/")
-	return fmt.Sprintf("%s/%s", r.LocalRootPath, remotePath)
-}
-
-func (r *Cli) SetRootPath(path string) {
-	localDir := filepath.Base(strings.TrimSpace(path))
-	if path == "/" {
-		localDir = "dropbox-local"
-	}
-
-	r.LocalRootPath = localDir                                          // 100days
-	r.RemoteRootPath = "/" + strings.Trim(strings.TrimSpace(path), "/") // /GitHub/100days
-}
-
 func (r *Cli) ListLocal(dir string, f func(path string, info fs.FileInfo) error) error {
 	info, err := os.Stat(dir)
 	if err != nil {
@@ -70,7 +25,7 @@ func (r *Cli) ListLocal(dir string, f func(path string, info fs.FileInfo) error)
 		return err
 	}
 	for _, info := range fs {
-		path := r.formatLocalPath(fmt.Sprintf("%s/%s", dir, info.Name()))
+		path := toLocalPath(formatPath(fmt.Sprintf("%s/%s", dir, info.Name())))
 		if err := f(path, info); err != nil {
 			return err
 		}
@@ -110,4 +65,55 @@ func (r *Cli) GenContentHash(localContent []byte) (string, error) {
 	}
 	result := sha256.Sum256(blocks)
 	return fmt.Sprintf("%x", result[:]), nil
+}
+
+// left no /
+// right may have /
+func formatPath(path string) string {
+	path = strings.TrimSpace(path)
+	if strings.HasPrefix(path, "./") {
+		path = path[1:]
+	}
+	// like /a/b/c/ or /a/b/c
+
+	path = strings.TrimLeft(path, "/")
+	// like a/b/c/ or a/b/c
+	return path
+}
+
+// return like a or a/b or a/b/c
+// left or right both has no /
+func formatPathByRev(base, path string) string {
+	// like some
+	base = filepath.Base(strings.Trim(strings.TrimSpace(base), "/"))
+
+	// like a/b/c/ or a/b/c
+	path = formatPath(path)
+
+	// path = a/b/c/, base=some, => a/b/c/some
+	if strings.HasSuffix(path, "/") {
+		path = strings.Trim(path, "/") + "/" + base
+	}
+
+	return path
+}
+
+func toRemotePath(path string) string {
+	return "/" + strings.Trim(path, "/")
+}
+
+func toLocalPath(path string) string {
+	return strings.Trim(path, "/")
+}
+
+func formatRelatePath(anotherRoot, sideRoot, sideFull string) string {
+	// 读取的 remote path 前几位，必须和 remoteRootPath 相同
+	if strings.ToLower(sideFull)[0:len(sideRoot)] != strings.ToLower(sideRoot) {
+		panic(fmt.Sprintf("%q not start with %q", sideFull, sideRoot))
+	}
+	// 去掉 remoteRootPath，得到后面的相对路径
+	base := strings.Trim(sideFull[len(sideRoot):], "/")
+
+	// 将相对路径和 local path 拼接，得到最终的本地路径
+	return fmt.Sprintf("%s/%s", strings.TrimRight(anotherRoot, "/"), base)
 }

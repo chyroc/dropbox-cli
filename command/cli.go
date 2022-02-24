@@ -8,10 +8,6 @@ import (
 type Cli struct {
 	config     dropbox.Config
 	fileClient files.Client
-
-	// state
-	LocalRootPath  string
-	RemoteRootPath string
 }
 
 func New(token string) *Cli {
