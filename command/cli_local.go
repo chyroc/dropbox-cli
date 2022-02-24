@@ -18,7 +18,7 @@ func (r *Cli) formatRemotePath(path string) string {
 
 // `.` or `GitHub`
 func (r *Cli) formatLocalPath(path string) string {
-	if strings.HasPrefix(path, ".") {
+	if strings.HasPrefix(path, "./") {
 		path = path[1:]
 	}
 	path = strings.Trim(strings.TrimSpace(path), "/")
@@ -26,6 +26,15 @@ func (r *Cli) formatLocalPath(path string) string {
 		path = "."
 	}
 	return path
+}
+
+func (r *Cli) formatRevRemotePath(localPath, path, remotePath string) string {
+	// localPath  = a/b
+	// path       = a/b/c/d.txt
+	// remotePath = Git
+
+	// result     = Git/c/d.txt
+	return fmt.Sprintf("%s/%s", remotePath, path[len(localPath)+1:])
 }
 
 func (r *Cli) generateLocalName(remotePath string) string {
@@ -48,12 +57,20 @@ func (r *Cli) SetRootPath(path string) {
 }
 
 func (r *Cli) ListLocal(dir string, f func(path string, info fs.FileInfo) error) error {
+	info, err := os.Stat(dir)
+	if err != nil {
+		return err
+	}
+	if !info.IsDir() {
+		return f(dir, info)
+	}
+
 	fs, err := ioutil.ReadDir(dir)
 	if err != nil {
 		return err
 	}
 	for _, info := range fs {
-		path := fmt.Sprintf("%s/%s", dir, info.Name())
+		path := r.formatLocalPath(fmt.Sprintf("%s/%s", dir, info.Name()))
 		if err := f(path, info); err != nil {
 			return err
 		}

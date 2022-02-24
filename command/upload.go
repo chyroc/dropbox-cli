@@ -2,6 +2,7 @@ package command
 
 import (
 	"fmt"
+	"io/fs"
 
 	"github.com/urfave/cli/v2"
 )
@@ -20,17 +21,32 @@ func Upload() *cli.Command {
 
 			fmt.Printf("> start upload %q to %q.\n", localPath, remotePath)
 
-			res, err := r.Upload(localPath, remotePath, func(idx int) {
-				fmt.Printf("> upload %q to %q block[%d] success.\n", localPath, remotePath, idx)
+			err := r.ListLocal(localPath, func(path string, info fs.FileInfo) error {
+				if info.IsDir() {
+					return nil
+				}
+
+				remotePath := r.formatRevRemotePath(localPath, path, remotePath)
+				localPath := path
+
+				res, err := r.Upload(localPath, remotePath, func(idx int) {
+					fmt.Printf("> upload %q to %q block[%d] success.\n", localPath, remotePath, idx)
+				})
+				if err != nil {
+					fmt.Printf("> upload %q to %q fail: %s.\n", localPath, remotePath, err)
+					return err
+				} else if res.Exist {
+					fmt.Printf("> upload %q to %q exist, skip.\n", localPath, remotePath)
+					return nil
+				}
+				fmt.Printf("> upload %q to %q success.\n", localPath, remotePath)
+				return nil
 			})
 			if err != nil {
-				fmt.Printf("> upload %q to %q fail: %s.\n", localPath, remotePath, err)
 				return err
-			} else if res.Exist {
-				fmt.Printf("> upload %q to %q exist, skip.\n", localPath, remotePath)
-				return nil
 			}
-			fmt.Printf("> upload %q to %q success.\n", localPath, remotePath)
+
+			// fmt.Printf("> upload %q to %q success.\n", localPath, remotePath)
 			return nil
 		},
 	}
