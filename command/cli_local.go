@@ -38,7 +38,7 @@ func (r *Cli) ListLocal(dir string, f func(path string, info os.FileInfo) error)
 }
 
 func (r *Cli) WriteToLocal(filename string, body io.Reader) error {
-	if err := os.MkdirAll(filepath.Dir(filename), 0755); err != nil {
+	if err := os.MkdirAll(filepath.Dir(filename), 0o755); err != nil {
 		return err
 	}
 

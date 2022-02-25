@@ -31,7 +31,7 @@ func (r *Cli) ListFolder(path string, f func(data files.IsMetadata) error) error
 			resp, err = r.fileClient.ListFolder(&files.ListFolderArg{
 				Path:                        path,
 				Recursive:                   true,
-				IncludeDeleted:              false,
+				IncludeDeleted:              true,
 				Limit:                       100,
 				IncludeNonDownloadableFiles: false,
 			})

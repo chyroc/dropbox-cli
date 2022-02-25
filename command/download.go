@@ -60,6 +60,12 @@ func Download() *cli.Command {
 						return err
 					}
 					fmt.Printf("> create file %q to %q success.\n", v.PathDisplay, local)
+				case *files.DeletedMetadata:
+					local := formatRelatePath(localRootPath, remoteRootPath, v.PathDisplay)
+					if fileToDelete, _ := os.Stat(local); fileToDelete != nil {
+						_ = os.RemoveAll(local)
+						fmt.Printf("> remove file %q success.\n", local)
+					}
 				}
 				return nil
 			})
