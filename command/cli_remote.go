@@ -15,6 +15,14 @@ func (r *Cli) ListFolder(path string, f func(data files.IsMetadata) error) error
 		path = ""
 	}
 
+	meta, err := r.fileClient.GetMetadata(&files.GetMetadataArg{Path: path})
+	if err != nil {
+		return err
+	}
+	if file, ok := meta.(*files.FileMetadata); ok {
+		return f(file)
+	}
+
 	cursor := ""
 	for {
 		var resp *files.ListFolderResult
