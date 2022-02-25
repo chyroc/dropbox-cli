@@ -95,11 +95,7 @@ func (r *Cli) Upload(localFile, remotePath string, blockSuccessCallback func(idx
 	}); fileMeta != nil {
 		meta, _ := fileMeta.(*files.FileMetadata)
 		if meta != nil {
-			localHash, err := r.GenContentHash(localContent)
-			if err != nil {
-				return res, err
-			}
-			if meta.ContentHash == localHash {
+			if r.TryCheckLocalContentHash([]byte(localContent), meta.ContentHash) {
 				res.Exist = true
 				return res, nil
 			}

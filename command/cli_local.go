@@ -52,7 +52,7 @@ func (r *Cli) WriteToLocal(filename string, body io.Reader) error {
 	return err
 }
 
-func (r *Cli) GenContentHash(localContent []byte) (string, error) {
+func (r *Cli) GenContentHash(localContent []byte) string {
 	blocks := []byte{}
 	size := 1024 * 1024 * 4
 	for i := 0; i < len(localContent); i += size {
@@ -65,7 +65,24 @@ func (r *Cli) GenContentHash(localContent []byte) (string, error) {
 		}
 	}
 	result := sha256.Sum256(blocks)
-	return fmt.Sprintf("%x", result[:]), nil
+	return fmt.Sprintf("%x", result[:])
+}
+
+func (r *Cli) TryCheckLocalContentHash(local interface{}, remoteContentHash string) bool {
+	var data []byte
+	switch local := local.(type) {
+	case string:
+		bs, err := ioutil.ReadFile(local)
+		if err != nil {
+			return false
+		}
+		data = bs
+	case []byte:
+		data = local
+	default:
+		panic("un-reachable")
+	}
+	return r.GenContentHash(data) == remoteContentHash
 }
 
 // left no /

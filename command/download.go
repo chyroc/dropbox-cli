@@ -35,6 +35,10 @@ func Download() *cli.Command {
 				switch v := data.(type) {
 				case *files.FileMetadata:
 					local := formatRelatePath(localRootPath, remoteRootPath, v.PathDisplay)
+					if r.TryCheckLocalContentHash(local, v.ContentHash) {
+						fmt.Printf("> download file %q to %q exist, skip.\n", v.PathDisplay, local)
+						return nil
+					}
 					body, err := r.Download(v.Id)
 					if err != nil {
 						fmt.Printf("> download file %q to %q fail: %s.\n", v.PathDisplay, local, err)
