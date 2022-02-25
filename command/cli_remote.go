@@ -5,6 +5,7 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
+	"strings"
 
 	"github.com/dropbox/dropbox-sdk-go-unofficial/v6/dropbox"
 	"github.com/dropbox/dropbox-sdk-go-unofficial/v6/dropbox/files"
@@ -17,10 +18,14 @@ func (r *Cli) ListFolder(path string, f func(data files.IsMetadata) error) error
 
 	meta, err := r.fileClient.GetMetadata(&files.GetMetadataArg{Path: path})
 	if err != nil {
-		return err
-	}
-	if file, ok := meta.(*files.FileMetadata); ok {
-		return f(file)
+		if !strings.Contains(err.Error(), "The root folder is unsupported.") {
+			return err
+		}
+		// continue to list folder
+	} else {
+		if file, ok := meta.(*files.FileMetadata); ok {
+			return f(file)
+		}
 	}
 
 	cursor := ""
