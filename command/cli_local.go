@@ -106,13 +106,16 @@ func toLocalPath(path string) string {
 }
 
 func formatRelatePath(anotherRoot, sideRoot, sideFull string) string {
-	// 读取的 remote path 前几位，必须和 remoteRootPath 相同
+	if sideRoot == sideFull {
+		return anotherRoot
+	}
+	// 读取的 sideFull path 前几位，必须和 sideRoot 相同
 	if strings.ToLower(sideFull)[0:len(sideRoot)] != strings.ToLower(sideRoot) {
 		panic(fmt.Sprintf("%q not start with %q", sideFull, sideRoot))
 	}
-	// 去掉 remoteRootPath，得到后面的相对路径
+	// 去掉 sideRoot，得到后面的相对路径
 	base := strings.Trim(sideFull[len(sideRoot):], "/")
 
-	// 将相对路径和 local path 拼接，得到最终的本地路径
+	// 将相对路径和 anotherRoot path 拼接，得到最终的相对路径
 	return fmt.Sprintf("%s/%s", strings.TrimRight(anotherRoot, "/"), base)
 }
