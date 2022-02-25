@@ -1,5 +1,13 @@
 # dropbox-cli
 
+## Installation
+
+```shell
+go install github.com/chyroc/dropbox-cli@latest
+```
+
+## Usage
+
 ### Download file
 
 ```shell
