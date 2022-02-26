@@ -15,12 +15,15 @@ func Download() *cli.Command {
 		UsageText: "dropbox-cli download <remote-path> <local-path>[/]",
 		Flags: []cli.Flag{
 			&cli.StringFlag{Name: "token"},
+			&cli.BoolFlag{Name: "disable-cursor-cache"},
 		},
 		Action: func(c *cli.Context) error {
-			r := New(c.String("token"))
+			r := New(c.String("token"), c.Bool("disable-cursor-cache"))
 
 			remoteRootPath := toRemotePath(formatPath(c.Args().Get(0)))                     // left slash, right no slash
 			localRootPath := toLocalPath(formatPathByRev(c.Args().Get(0), c.Args().Get(1))) // left, right both no slash
+			r.setLocalRootPath(localRootPath)
+
 			if remoteRootPath == "" {
 				fmt.Printf("> download fail: empty remote path.\n")
 				return fmt.Errorf("empty remote path")

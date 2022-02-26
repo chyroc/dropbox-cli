@@ -2,6 +2,7 @@ package command
 
 import (
 	"bytes"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"os"
@@ -29,6 +30,10 @@ func (r *Cli) ListFolder(path string, f func(data files.IsMetadata) error) error
 	}
 
 	cursor := ""
+	if !r.disableCursorCache {
+		cursor = r.getCursor()
+		fmt.Printf("> [meta] get cursor=%s\n", cursor)
+	}
 	for {
 		var resp *files.ListFolderResult
 		var err error
@@ -44,6 +49,9 @@ func (r *Cli) ListFolder(path string, f func(data files.IsMetadata) error) error
 			resp, err = r.fileClient.ListFolderContinue(&files.ListFolderContinueArg{
 				Cursor: cursor,
 			})
+		}
+		if !r.disableCursorCache && resp != nil && resp.Cursor != "" {
+			r.setCursor(cursor)
 		}
 		if err != nil {
 			return err

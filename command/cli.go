@@ -8,13 +8,17 @@ import (
 type Cli struct {
 	config     dropbox.Config
 	fileClient files.Client
+
+	disableCursorCache bool
+	localRootPath      string
 }
 
-func New(token string) *Cli {
+func New(token string, disableCursorCache bool) *Cli {
 	r := new(Cli)
 	r.config = dropbox.Config{
 		Token: token,
 	}
+	r.disableCursorCache = disableCursorCache
 
 	r.fileClient = files.New(r.config)
 

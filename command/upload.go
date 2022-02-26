@@ -15,7 +15,7 @@ func Upload() *cli.Command {
 			&cli.StringFlag{Name: "token"},
 		},
 		Action: func(c *cli.Context) error {
-			r := New(c.String("token"))
+			r := New(c.String("token"), false)
 
 			localRootPath := toLocalPath(formatPath(c.Args().Get(0)))                         // left, right both no slash
 			remoteRootPath := toRemotePath(formatPathByRev(c.Args().Get(0), c.Args().Get(1))) // left slash, right no slash
