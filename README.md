@@ -35,3 +35,7 @@ dropbox-cli upload ./local path
 # and `local/1.txt` to `path/local/1.txt`
 dropbox-cli upload ./local path/
 ```
+
+## TODO
+
+- [ ] download check hash
