@@ -32,7 +32,7 @@ func Download() *cli.Command {
 
 			fmt.Printf("> start download %q to %q.\n", remoteRootPath, localRootPath)
 
-			pool := grpool.NewPool(10, 100)
+			pool := grpool.NewPool(20, 100)
 			defer pool.Release()
 
 			err := r.ListFolder(remoteRootPath, func(data files.IsMetadata) error {
