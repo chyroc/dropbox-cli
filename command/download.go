@@ -57,6 +57,19 @@ func Download() *cli.Command {
 	}
 }
 
+func (r *Cli) download(localRootPath, remoteRootPath string, data files.IsMetadata) error {
+	switch v := data.(type) {
+	case *files.FileMetadata:
+		return r.downloadFile(localRootPath, remoteRootPath, v)
+	case *files.FolderMetadata:
+		return r.downloadDir(localRootPath, remoteRootPath, v)
+	case *files.DeletedMetadata:
+		return r.downloadDel(localRootPath, remoteRootPath, v)
+	default:
+		return nil
+	}
+}
+
 func (r *Cli) downloadFile(localRootPath, remoteRootPath string, v *files.FileMetadata) error {
 	local := formatRelatePath(localRootPath, remoteRootPath, v.PathDisplay)
 	if r.TryCheckLocalContentHash(local, v.ContentHash) {
@@ -74,21 +87,9 @@ func (r *Cli) downloadFile(localRootPath, remoteRootPath string, v *files.FileMe
 		fmt.Printf("> download file %q to %q fail: %s.\n", v.PathDisplay, local, err)
 		return err
 	}
+	_ = os.Chtimes(local, v.ClientModified, v.ClientModified)
 	fmt.Printf("> download file %q to %q success.\n", v.PathDisplay, local)
 	return nil
-}
-
-func (r *Cli) download(localRootPath, remoteRootPath string, data files.IsMetadata) error {
-	switch v := data.(type) {
-	case *files.FileMetadata:
-		return r.downloadFile(localRootPath, remoteRootPath, v)
-	case *files.FolderMetadata:
-		return r.downloadDir(localRootPath, remoteRootPath, v)
-	case *files.DeletedMetadata:
-		return r.downloadDel(localRootPath, remoteRootPath, v)
-	default:
-		return nil
-	}
 }
 
 func (r *Cli) downloadDir(localRootPath, remoteRootPath string, v *files.FolderMetadata) error {
