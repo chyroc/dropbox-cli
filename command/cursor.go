@@ -24,7 +24,7 @@ func (r *Cli) setCursor(cursor string) {
 	meta := r.loadMeta()
 	meta.Cursor = cursor
 	if bs, _ := json.Marshal(meta); len(bs) > 0 {
-		err := ioutil.WriteFile(file, bs, 0644)
+		err := ioutil.WriteFile(file, bs, 0o644)
 		if err != nil {
 			fmt.Printf("> [meta] save cursor fail: %s\n", err.Error())
 		}
