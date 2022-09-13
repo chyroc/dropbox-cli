@@ -33,7 +33,9 @@ func SaveURL() *cli.Command {
 					return err
 				}
 			}
-			path = "/" + path
+			if !strings.HasPrefix(path, "/") {
+				path = "/" + path
+			}
 
 			fmt.Printf("> start save url %q to %q.\n", uri, path)
 
@@ -62,7 +64,7 @@ func urlToFilepath(uri string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	path := fmt.Sprintf("%s/%s", uriParsed.Host, uriParsed.Path)
+	path := uriParsed.Host + uriParsed.Path
 	for _, v := range []string{":", "/", "+", "-", " "} {
 		path = strings.ReplaceAll(path, v, "_")
 	}

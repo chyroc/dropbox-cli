@@ -36,6 +36,13 @@ dropbox-cli upload ./local path
 dropbox-cli upload ./local path/
 ```
 
+### Save URl
+
+```shell
+# save `https://github.com/obsidianmd/obsidian-releases/releases/download/v0.15.9/Obsidian-0.15.9-universal.dmg` to `github.com_obsidianmd_obsidian_releases_releases_download_v0.15.9_Obsidian_0.15.9_universal.dmg`
+dropbox-cli save-url 'https://github.com/obsidianmd/obsidian-releases/releases/download/v0.15.9/Obsidian-0.15.9-universal.dmg'
+```
+
 ## TODO
 
 - [ ] download check hash
