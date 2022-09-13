@@ -14,6 +14,7 @@ func main() {
 		Commands: []*cli.Command{
 			command.Download(),
 			command.Upload(),
+			command.SaveURL(),
 		},
 	}
 	err := app.Run(os.Args)

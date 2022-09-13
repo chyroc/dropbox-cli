@@ -1,6 +1,8 @@
 package command
 
 import (
+	"os"
+
 	"github.com/dropbox/dropbox-sdk-go-unofficial/v6/dropbox"
 	"github.com/dropbox/dropbox-sdk-go-unofficial/v6/dropbox/files"
 )
@@ -14,6 +16,9 @@ type Cli struct {
 }
 
 func New(token string, disableCursorCache bool) *Cli {
+	if token == "" {
+		token = os.Getenv("DROPBOX_TOKEN")
+	}
 	r := new(Cli)
 	r.config = dropbox.Config{
 		Token: token,
