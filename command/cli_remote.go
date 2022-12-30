@@ -157,6 +157,7 @@ func (r *Cli) Upload(localFile, remotePath string, blockSuccessCallback func(idx
 			reader = bytes.NewReader(localContent[i : i+blockSize])
 		}
 
+		// 这里不能使用并发, 必须一个接着一个的上传
 		err = r.fileClient.UploadSessionAppendV2(&files.UploadSessionAppendArg{
 			Cursor: &files.UploadSessionCursor{
 				SessionId: resp.SessionId,

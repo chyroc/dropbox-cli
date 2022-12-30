@@ -4,8 +4,9 @@ import (
 	"log"
 	"os"
 
-	"github.com/chyroc/dropbox-cli/command"
 	"github.com/urfave/cli/v2"
+
+	"github.com/chyroc/dropbox-cli/command"
 )
 
 func main() {
