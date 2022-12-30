@@ -3,6 +3,7 @@ package command
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/urfave/cli/v2"
 )
@@ -31,7 +32,7 @@ func Upload() *cli.Command {
 			fmt.Printf("> start upload %q to %q.\n", localRootPath, remoteRootPath)
 
 			err := r.ListLocal(localRootPath, func(localPath string, info os.FileInfo) error {
-				if info.IsDir() {
+				if info.IsDir() || strings.HasPrefix(info.Name(), ".") {
 					return nil
 				}
 
