@@ -38,7 +38,7 @@ func Download() *cli.Command {
 			pool := grpool.NewPool(20, 100)
 			defer pool.Release()
 
-			err := r.ListFolder(remoteRootPath, func(data files.IsMetadata) error {
+			err := r.ListFolder(remoteRootPath, true, true, func(data files.IsMetadata) error {
 				v := data
 				pool.JobQueue <- func() {
 					_ = r.download(localRootPath, remoteRootPath, v)

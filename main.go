@@ -16,6 +16,7 @@ func main() {
 			command.Download(),
 			command.Upload(),
 			command.SaveURL(),
+			command.Prompt(),
 		},
 	}
 	err := app.Run(os.Args)
